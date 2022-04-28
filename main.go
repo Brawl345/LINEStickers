@@ -14,19 +14,20 @@ import (
 	"sync"
 )
 
-const Version = "1.1.1"
+const Version = "1.2.0"
 
 func usage() {
 	var sb strings.Builder
 
 	sb.WriteString(fmt.Sprintf("LINE Sticker Downloader v%s\n", Version))
-	sb.WriteString(fmt.Sprintf("Usage: %s [--static] [--force] packageID\n\n", os.Args[0]))
+	sb.WriteString(fmt.Sprintf("Usage: %s [--static] [--force] [--output=folder] packageID\n\n", os.Args[0]))
 	sb.WriteString("positional arguments:\n")
 	sb.WriteString("  packgeID    Line Package ID from the store\n")
 
 	sb.WriteString("\noptional arguments:\n")
-	sb.WriteString("  --static    Always download static PNGs\n")
-	sb.WriteString("  --force     Override existing stickers\n")
+	sb.WriteString("  --output=FOLDER\tDownload to this folder (default: 'output')\n")
+	sb.WriteString("  --static\t\tAlways download static PNGs\n")
+	sb.WriteString("  --force\t\tOverride existing stickers\n")
 
 	fmt.Print(sb.String())
 }
@@ -39,6 +40,7 @@ func fileExists(fileName string) bool {
 }
 
 func main() {
+	outputFolder := flag.String("output", "output", "Download to this folder")
 	static := flag.Bool("static", false, "Always download static PNGs")
 	force := flag.Bool("force", false, "Override existing stickers")
 	flag.Parse()
@@ -79,7 +81,7 @@ func main() {
 
 	log.Printf("=> Found pack '%s' by '%s'!", response.LocalizedTitle(), response.LocalizedAuthor())
 
-	savePath := filepath.Join("output", fmt.Sprintf("LINE_%d", response.PackageID))
+	savePath := filepath.Join(*outputFolder, fmt.Sprintf("LINE_%d", response.PackageID))
 	err = os.MkdirAll(savePath, 0770)
 	if err != nil {
 		log.Fatalf("Could not create directory: %v", err)
