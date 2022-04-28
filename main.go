@@ -14,33 +14,46 @@ import (
 	"sync"
 )
 
-func Usage() {
+const Version = "1.1.0"
+
+func usage() {
 	var sb strings.Builder
 
-	sb.WriteString(fmt.Sprintf("Usage: %s [--static] packageID\n\n", os.Args[0]))
+	sb.WriteString(fmt.Sprintf("LINE Sticker Downloader v%s\n", Version))
+	sb.WriteString(fmt.Sprintf("Usage: %s [--static] [--force] packageID\n\n", os.Args[0]))
 	sb.WriteString("positional arguments:\n")
 	sb.WriteString("  packgeID    Line Package ID from the store\n")
 
 	sb.WriteString("\noptional arguments:\n")
 	sb.WriteString("  --static    Always download static PNGs\n")
+	sb.WriteString("  --force     Override existing stickers\n")
 
 	fmt.Print(sb.String())
 }
 
+func fileExists(fileName string) bool {
+	if _, err := os.Stat(fileName); err == nil {
+		return true
+	}
+	return false
+}
+
 func main() {
 	static := flag.Bool("static", false, "Always download static PNGs")
+	force := flag.Bool("force", false, "Override existing stickers")
 	flag.Parse()
 	if flag.NArg() != 1 {
-		Usage()
+		usage()
 		os.Exit(0)
 	}
 
 	packageId, err := strconv.ParseInt(flag.Arg(0), 10, 64)
 	if err != nil {
-		Usage()
+		usage()
 		os.Exit(0)
 	}
 
+	log.Printf("LINE Sticker Downloader v%s\n", Version)
 	log.Print("Getting LINE sticker pack...")
 
 	httpResp, err := http.Get(fmt.Sprintf(MetaUrl, packageId))
@@ -81,7 +94,13 @@ func main() {
 
 		go func() {
 			defer wg.Done()
-			out, err := os.Create(filepath.Join(savePath, sticker.FileName()))
+			stickerPath := filepath.Join(savePath, sticker.FileName())
+			if fileExists(stickerPath) && !*force {
+				log.Printf("=> Skipping %s (already exists)", sticker.FileName())
+				return
+			}
+
+			out, err := os.Create(stickerPath)
 			if err != nil {
 				log.Print("Could not create file ", err)
 				return
