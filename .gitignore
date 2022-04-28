@@ -1,7 +1,2 @@
-__pycache__/
-*.py[cod]
-*$py.class
-src/
-venv/
-.idea/
-output/
+.idea
+output

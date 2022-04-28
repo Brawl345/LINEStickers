@@ -1,16 +1,16 @@
-LINEStickers
-============
+# LINE Stickers
+
 Download LINE sticker packs for free. Also works with geo-restricted ones.
 
 Usage:
+
 ```
-usage: line.py [-h] [--static] storeid
+Usage: linestickers [--static] packageID
 
 positional arguments:
-  storeid     LINE Store ID
+  packgeID    Line Package ID from the store
 
 optional arguments:
-  -h, --help  show this help message and exit
   --static    Always download static PNGs
 ```
 
