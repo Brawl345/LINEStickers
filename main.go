@@ -14,7 +14,7 @@ import (
 	"sync"
 )
 
-const Version = "1.1.0"
+const Version = "1.1.1"
 
 func usage() {
 	var sb strings.Builder
@@ -80,7 +80,7 @@ func main() {
 	log.Printf("=> Found pack '%s' by '%s'!", response.LocalizedTitle(), response.LocalizedAuthor())
 
 	savePath := filepath.Join("output", fmt.Sprintf("LINE_%d", response.PackageID))
-	err = os.MkdirAll(savePath, 0660)
+	err = os.MkdirAll(savePath, 0770)
 	if err != nil {
 		log.Fatal("Could not create directory", err)
 	}
