@@ -82,7 +82,7 @@ func main() {
 	savePath := filepath.Join("output", fmt.Sprintf("LINE_%d", response.PackageID))
 	err = os.MkdirAll(savePath, 0770)
 	if err != nil {
-		log.Fatal("Could not create directory", err)
+		log.Fatalf("Could not create directory: %v", err)
 	}
 
 	log.Printf("=> Downloading %d stickers...", len(response.Stickers))
@@ -102,7 +102,7 @@ func main() {
 
 			out, err := os.Create(stickerPath)
 			if err != nil {
-				log.Print("Could not create file ", err)
+				log.Printf("Could not create file: %v", err)
 				return
 			}
 
@@ -115,7 +115,7 @@ func main() {
 
 			httpResp, err := http.Get(url)
 			if err != nil {
-				log.Printf("Could not download sticker %d: %v ", sticker.ID, err)
+				log.Printf("Could not download sticker %d: %v", sticker.ID, err)
 				return
 			}
 
@@ -127,7 +127,7 @@ func main() {
 			defer httpResp.Body.Close()
 			_, err = io.Copy(out, httpResp.Body)
 			if err != nil {
-				log.Print("Could not write to file ", err)
+				log.Printf("Could not write to file: %v", err)
 				return
 			}
 		}()
@@ -140,23 +140,23 @@ func main() {
 
 	infoFile, err := os.Create(filepath.Join(savePath, "info.json"))
 	if err != nil {
-		log.Fatal("Could not create info file", err)
+		log.Fatalf("Could not create info file: %v", err)
 	}
 	defer infoFile.Close()
 	infoJson, err := json.MarshalIndent(response, "", "  ")
 	if err != nil {
-		log.Fatal("Could not marshal info file", err)
+		log.Fatalf("Could not marshal info file: %v", err)
 	}
 	_, err = infoFile.Write(infoJson)
 	if err != nil {
-		log.Fatal("Could not write to info file", err)
+		log.Fatalf("Could not write to info file: %v", err)
 	}
 
 	log.Print("Writing info file...")
 
 	infoTxt, err := os.Create(filepath.Join(savePath, "info.txt"))
 	if err != nil {
-		log.Fatal("Could not create info text file", err)
+		log.Fatalf("Could not create info text file: %v", err)
 	}
 	defer infoTxt.Close()
 
@@ -204,7 +204,7 @@ func main() {
 
 	_, err = infoTxt.WriteString(sb.String())
 	if err != nil {
-		log.Fatal("Could not write to info text file", err)
+		log.Fatalf("Could not write to info text file: %v", err)
 	}
 
 	log.Print("DONE!")
